@@ -1,0 +1,174 @@
+:root{
+  --bg:#0b0d10;
+  --panel:#0f1114;
+  --muted:#9aa4b2;
+  --accent:#e95353; /* subtle red poke-ish */
+  --glass: rgba(255,255,255,0.03);
+  --card-radius:14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, #060708 0%, #0b0d10 100%);
+  color:#d7e1ea;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding:18px;
+}
+
+/* container */
+.container{
+  max-width:980px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+/* Top */
+.topbar{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.title{
+  margin:0;
+  font-size:28px;
+  letter-spacing:0.6px;
+}
+.subtitle{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* card */
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:var(--card-radius);
+  padding:16px;
+  box-shadow: 0 6px 18px rgba(2,6,12,0.6);
+}
+
+/* drip */
+.avatar-wrap{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  margin-top:8px;
+}
+.avatar-wrap img{
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:12px;
+  background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.03);
+  padding:6px;
+  transition: transform .28s ease;
+}
+.avatar-wrap img:hover{ transform: translateY(-6px) scale(1.02); }
+
+.outfit-info{ display:flex; flex-direction:column; gap:6px;}
+.tag{
+  background:var(--glass);
+  padding:8px 10px;
+  border-radius:10px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* shinies grid */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+  gap:12px;
+  margin-top:12px;
+}
+
+.shiny-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.03);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.shiny-card:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+}
+
+.poke-img{
+  width:80px;
+  height:80px;
+  margin:0 auto 8px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+  transition: transform .28s ease;
+}
+.poke-name{
+  font-size:13px;
+  color:var(--muted);
+  text-transform: capitalize;
+}
+
+/* shiny sparkle — visible only on shiny overlay */
+.sparkles{
+  pointer-events:none;
+  position:absolute;
+  inset:0;
+  mix-blend-mode:screen;
+  opacity:0;
+  transition:opacity .25s ease;
+}
+.shiny .sparkles{ opacity:1; }
+
+.sparkle{
+  position:absolute;
+  width:14px;
+  height:14px;
+  background: linear-gradient(45deg, rgba(255,255,255,0.9), rgba(255,255,255,0.3));
+  transform: rotate(25deg) scale(.6);
+  border-radius:3px;
+  filter: blur(0.6px);
+  animation: sparkle 1.6s infinite;
+  opacity:.95;
+}
+
+@keyframes sparkle{
+  0%{ transform: translateY(6px) scale(0.3) rotate(20deg); opacity:0; }
+  10%{ opacity:1; transform: translateY(-6px) scale(1) rotate(20deg); }
+  60%{ opacity:0.6; transform: translateY(-12px) scale(0.9) rotate(20deg); }
+  100%{ opacity:0; transform: translateY(6px) scale(0.3) rotate(20deg); }
+}
+
+/* show label for shiny */
+.badge{
+  position:absolute;
+  top:8px;
+  right:8px;
+  font-size:11px;
+  padding:6px 8px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent), #ff7b7b);
+  color:#fff;
+  box-shadow: 0 6px 18px rgba(233,83,83,0.12);
+}
+
+/* status text */
+.status{ color:var(--muted); margin-top:10px; font-size:13px; }
+
+/* footer */
+.foot{ text-align:center; color:var(--muted); padding:12px 0; font-size:12px; }
+
+/* responsive tweaks */
+@media (max-width:520px){
+  .avatar-wrap{flex-direction:row; gap:10px}
+  .avatar-wrap img{width:96px; height:96px}
+}
