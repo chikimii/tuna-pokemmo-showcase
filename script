@@ -1,0 +1,123 @@
+// script.js
+const username = "Tuna";
+const shiniesRaw = [
+  "psyduck",
+  "duskclops", // user typed this; we'll map it
+  "golurk",
+  "haxorus",
+  "aggron",
+  "octillery",
+  "joltik",
+  "weezing",
+  "scolipede",
+  "whirlipede",
+  "liligant" // user typed this; we'll map it
+];
+
+// mapping for common typos / alternate spellings to PokeAPI slugs
+const nameMap = {
+  "duskclops": "dusclops",
+  "liligant": "lilligant"
+};
+
+// produce final slugs for API
+const species = shiniesRaw.map(n => (nameMap[n.toLowerCase()] || n.toLowerCase()));
+
+const grid = document.getElementById("shiny-grid");
+const status = document.getElementById("status");
+
+async function fetchPokemon(pokeName) {
+  const url = `https://pokeapi.co/api/v2/pokemon/${encodeURIComponent(pokeName)}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Not found: ${pokeName}`);
+    return await res.json();
+  } catch (err) {
+    console.warn("Fetch error:", err);
+    return null;
+  }
+}
+
+function createSparkles() {
+  const wrap = document.createElement("div");
+  wrap.className = "sparkles";
+  // create 3 sparkles with slight random positions & delays
+  for (let i=0;i<3;i++){
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.style.left = `${10 + Math.random()*70}%`;
+    s.style.top = `${10 + Math.random()*70}%`;
+    s.style.animationDelay = `${Math.random()*1.2}s`;
+    s.style.opacity = 0.9 - Math.random()*0.5;
+    wrap.appendChild(s);
+  }
+  return wrap;
+}
+
+async function renderAll() {
+  status.textContent = "Loading sprites from PokeAPI…";
+  let loaded = 0;
+  for (const name of species) {
+    const data = await fetchPokemon(name);
+    const card = document.createElement("div");
+    card.className = "shiny-card";
+
+    const img = document.createElement("img");
+    img.className = "poke-img";
+    img.alt = name;
+
+    const label = document.createElement("div");
+    label.className = "poke-name";
+    label.textContent = name;
+
+    // default fallback: show text if nothing found
+    if (!data) {
+      img.src = "assets/missing.png";
+      card.appendChild(img);
+      card.appendChild(label);
+      grid.appendChild(card);
+      continue;
+    }
+
+    // prefer sprite front_default and front_shiny
+    const spriteDefault = data.sprites?.front_default || data.sprites?.other?.["official-artwork"]?.front_default;
+    const spriteShiny = data.sprites?.front_shiny || (data.sprites?.other?.["official-artwork"]?.front_shiny || null);
+
+    // show the shiny if available as primary image (user asked to display shinies)
+    if (spriteShiny) {
+      img.src = spriteShiny;
+      card.classList.add("shiny");
+      const b = document.createElement("div"); b.className = "badge"; b.textContent = "SHINY";
+      card.appendChild(b);
+      card.appendChild(createSparkles());
+    } else if (spriteDefault) {
+      img.src = spriteDefault;
+    } else {
+      img.src = "assets/missing.png";
+    }
+
+    // let user click to toggle between shiny/normal if both exist
+    if (spriteDefault && spriteShiny) {
+      img.style.cursor = "pointer";
+      let showingShiny = true;
+      img.addEventListener("click", () => {
+        showingShiny = !showingShiny;
+        img.src = showingShiny ? spriteShiny : spriteDefault;
+        if (showingShiny) card.classList.add("shiny");
+        else card.classList.remove("shiny");
+      });
+    }
+
+    card.appendChild(img);
+    card.appendChild(label);
+    grid.appendChild(card);
+
+    loaded++;
+    status.textContent = `Loaded ${loaded} / ${species.length}`;
+  }
+
+  status.textContent = `Loaded ${loaded} shinies — images pulled live from PokeAPI.`;
+}
+
+// kick off
+renderAll();
